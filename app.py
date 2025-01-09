@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 from typing import List, Optional
 from pydantic import BaseModel
+import json
 
 # Configuração do MongoDB
 client = MongoClient("mongodb://localhost:27017/")
@@ -44,23 +45,32 @@ async def get_all_entities(
     - `limit`: Número máximo de documentos a retornar.
     """
     try:
-        collection = db[collection_name]
-        filter_query = eval(query)  # Converte string para dicionário (cuidado em produção)
-    except Exception:
+        # Convertendo o filtro de JSON para dicionário
+        filter_query = json.loads(query)
+    except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid query format")
 
+    # Construção da projeção
     projection = {}
     if fields:
         for field in fields.split(","):
             if field.startswith("-"):
-                projection[field[1:]] = 0
+                projection[field[1:]] = 0  # Excluir o campo
             else:
-                projection[field] = 1
+                projection[field] = 1  # Incluir o campo
 
-    entidades = list(collection.find(filter_query, projection).skip(skip).limit(limit))
-    for entidade in entidades:
-        entidade["_id"] = str(entidade["_id"])  # Converte ObjectId para string
-    return entidades
+    try:
+        collection = db[collection_name]
+        # Consulta no MongoDB
+        entidades = list(
+            collection.find(filter_query, projection).skip(skip).limit(limit)
+        )
+        # Convertendo ObjectId para string
+        for entidade in entidades:
+            entidade["_id"] = str(entidade["_id"])
+        return entidades
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving entities: {str(e)}")
 
 # Obter um único documento por ID
 @app.get("/{collection_name}/{id}")
