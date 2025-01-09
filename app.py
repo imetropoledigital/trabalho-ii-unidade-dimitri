@@ -27,6 +27,21 @@ async def create_entity(collection_name: str, entity: GenericEntity):
     result = collection.insert_one(entity.data)
     return {"message": "Entity created successfully", "id": str(result.inserted_id)}
 
+
+
+
+@app.get("/collections")
+async def get_collections():
+    """
+    Retorna todas as coleções disponíveis no banco de dados.
+    """
+    try:
+        collections = db.list_collection_names()
+        return {"collections": collections}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving collections: {str(e)}")
+
+
 # Listagem de todas as entidades com projeção simples
 @app.get("/{collection_name}")
 async def get_all_entities(
