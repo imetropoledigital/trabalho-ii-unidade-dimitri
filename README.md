@@ -12,9 +12,9 @@ Certifique-se de ter os seguintes requisitos instalados:
 
 ```plaintext
 trabalho-ii-unidade-dimitri/
-├── app.py          # Código principal da API
-├── requirements.txt # Dependências do projeto 
-├── README.md        # Documentação do projeto
+├── app.py          
+├── requirements.txt  
+├── README.md       
 ```
 
 ## Instalação
@@ -97,21 +97,3 @@ trabalho-ii-unidade-dimitri/
   curl -X GET "http://127.0.0.1:8000/collections"
   ```
 
-## Testando no Terminal
-
-### Exemplos de consultas com `curl`
-
-1. Buscar documentos com filtro Regex:
-   ```bash
-   curl -X GET "http://127.0.0.1:8000/pessoa?query={\"name\":{\"$regex\":\"^Ma\"}}"
-   ```
-
-2. Buscar documentos com condição de comparação:
-   ```bash
-   curl -X GET "http://127.0.0.1:8000/pessoa?query={\"age\":{\"$gte\":25}}"
-   ```
-
-3. Projeção de campos:
-   ```bash
-   curl -X GET "http://127.0.0.1:8000/pessoa?fields=name,age"
-   ```
